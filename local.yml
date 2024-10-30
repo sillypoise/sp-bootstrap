@@ -1,0 +1,30 @@
+- hosts: all
+  tags: always
+  become: true
+  pre_tasks:
+    - name: pre-run | update package cache (arch)
+      tags: always
+      ansible.builtin.pacman:
+        update_cache: true
+        upgrade: yes
+      changed_when: False
+      when: ansible_distribution == "Archlinux"
+
+    - name: pre-run | update package cache (debian, etc)
+      tags: always
+      ansible.builtin.apt: 
+        update_cache: true
+        changed_when: False
+      when: ansible_distribution in ["Debian", "Ubuntu"]
+
+    # - name: Install community.general collection
+    #   ansible.builtin.command: ansible-galaxy collection install community.general
+    #   tags: bootstrap
+
+# run roles
+- hosts: all
+  tags: base
+  become: true
+  roles:
+    - base
+
